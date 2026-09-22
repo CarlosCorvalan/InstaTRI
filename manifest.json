@@ -1,0 +1,16 @@
+{
+  "name": "InstaTRI",
+  "short_name": "InstaTRI",
+  "description": "Bitácora fotográfica por etapa fenológica — proyectos ITR, campaña 26-27",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F8EF",
+  "theme_color": "#1F3D1A",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
