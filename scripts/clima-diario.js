@@ -56,6 +56,10 @@ async function sbFetch(path, options = {}) {
   return res.status === 204 ? null : res.json();
 }
 
+async function esperar(ms){
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function main() {
   escribirResumen(`## Clima diario — resultado del run`);
 
@@ -86,8 +90,15 @@ async function main() {
         `&timezone=auto&past_days=2&forecast_days=1`;
 
       const res = await fetch(url);
-      if (!res.ok) throw new Error(`Open-Meteo respondió ${res.status}`);
-      const json = await res.json();
+      const bodyText = await res.text();
+      if (!res.ok) throw new Error(`Open-Meteo ${res.status}: ${bodyText.slice(0, 150)}`);
+
+      let json;
+      try {
+        json = JSON.parse(bodyText);
+      } catch (e) {
+        throw new Error(`Respuesta no-JSON de Open-Meteo (status ${res.status}): "${bodyText.slice(0, 150)}"`);
+      }
 
       const idx = (json.daily?.time ?? []).indexOf(fecha);
       if (idx === -1) throw new Error(`Sin dato de Open-Meteo para ${fecha}`);
@@ -105,9 +116,10 @@ async function main() {
       filas.push(`| ${campo.nombre} | ${tmax} | ${tmin} | ${gduDia} | OK |`);
       ok++;
     } catch (e) {
-      filas.push(`| ${campo.nombre} | — | — | — | ERROR: ${String(e.message).slice(0, 80)} |`);
+      filas.push(`| ${campo.nombre} | — | — | — | ERROR: ${String(e.message).slice(0, 150)} |`);
       errores.push({ campo: campo.nombre, error: e.message });
     }
+    await esperar(400); // pausa chica entre pedidos, para no saturar Open-Meteo
   }
 
   escribirResumen(`\n${filas.join("\n")}`);
