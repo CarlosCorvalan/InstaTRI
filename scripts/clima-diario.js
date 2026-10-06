@@ -34,9 +34,14 @@ function calcularGduDia(tmax, tmin) {
 }
 
 function fechaAyerISO() {
-  const d = new Date();
-  d.setUTCDate(d.getUTCDate() - 1);
-  return d.toISOString().slice(0, 10);
+  // "Ayer" según el calendario de Argentina (UTC-3, sin horario de verano),
+  // no según UTC — de noche en Argentina, UTC ya está en el día siguiente,
+  // y con la cuenta vieja eso hacía que el script guardara el día de HOY
+  // (todavía sin terminar) como si fuera un dato ya cerrado.
+  const OFFSET_ART_MS = 3 * 60 * 60 * 1000;
+  const ahoraComoART = new Date(Date.now() - OFFSET_ART_MS);
+  ahoraComoART.setUTCDate(ahoraComoART.getUTCDate() - 1);
+  return ahoraComoART.toISOString().slice(0, 10);
 }
 
 async function sbFetch(path, options = {}) {
